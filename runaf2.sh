@@ -11,11 +11,13 @@
 # Display correct usage if input is incorrect
 function usage() {
   scriptName=$(basename $0);
-  printf "usage: ./$scriptName [-h] [-o DIRECTORY] [-e DIRECTORY] [DIRECTORY]\n"
-  printf "Run one or more Alphafold batch jobs for each protein sequence file in a directory.\n\n"
+  printf "usage: ./$scriptName [-h] [-o DIRECTORY] [-e DIRECTORY] [FILE/DIRECTORY]\n"
+  printf "Run one or more Alphafold batch jobs for each protein sequence file in a directory. You can also pass in individual sequence files.\n\n"
   printf "  -h         display help\n"
-  printf "  -e error   specify output directory (in current directory by default)\n"
+  printf "  -e error   specify output directory \n"
+  printf "             default format: alphafold_error_<current datetime>\n"
   printf "  -o output  specify error directory  (in current directory by default)\n"
+  printf "             default format: alphafold_output_<current datetime>\n"
 }
 
 # One way to pass command-line arguments to job script
@@ -102,6 +104,13 @@ then
     mkdir -p $proteinErrorDir
     run_sbatch $proteinErrorDir $outputDir $proteinFile
   done
+  exit 0
+elif [[ -f $* ]];
+then
+  proteinDir=$(basename $*)
+  proteinErrorDir="$errorDir/${proteinDir%.*}"  
+  mkdir -p $proteinErrorDir
+  run_sbatch $proteinErrorDir $outputDir $*
   exit 0
 else
   echo "Invalid or nonexistent directory $*"

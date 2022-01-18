@@ -11,13 +11,17 @@
 # Display correct usage if input is incorrect
 function usage() {
   scriptName=$(basename $0);
-  printf "usage: ./$scriptName [-h] [-o DIRECTORY] [-e DIRECTORY] [FILE/DIRECTORY]\n"
+  printf "usage: ./$scriptName [-h] [-a FILE] [-p DIR] [-o DIR] [-e DIR] FILE/DIR\n"
   printf "Run one or more Alphafold batch jobs for each protein sequence file in a directory. You can also pass in individual sequence files.\n\n"
-  printf "  -h         display help\n"
-  printf "  -e error   specify output directory \n"
-  printf "             default format: alphafold_error_<current datetime>\n"
-  printf "  -o output  specify error directory  (in current directory by default)\n"
-  printf "             default format: alphafold_output_<current datetime>\n"
+  printf "  -h                display help\n"
+  printf "  -a alphafold      optionally specify location of alphafold script \n"
+  printf "                    default location: /cluster/tufts/cmdb295class/shared/alphafold/alphafold/run_af2.py \n"
+  printf "  -p alphafold path optionally specify alphafold path \n"
+  printf "                    default is parent directory of provided script \n"
+  printf "  -e error          optionally specify output directory \n"
+  printf "                    default format: alphafold_error_<current datetime>\n"
+  printf "  -o output         optionally specify error directory  (in current directory by default)\n"
+  printf "                    default format: alphafold_output_<current datetime>\n"
 }
 
 # One way to pass command-line arguments to job script
@@ -35,7 +39,7 @@ sbatch <<EOT
 #SBATCH -N 1
 #SBATCH --gres=gpu:1	# number of GPUs, using v100 --gres=gpu:v100:1, using a100 --gres=gpu:a100:1
  
-export alphafold_path=/cluster/tufts/cmdb295class/shared/alphafold/alphafold
+export alphafold_path=$2
 module load cuda/11.0 cudnn/8.0.4-11.0 anaconda/2021.05
 module list
 nvidia-smi
@@ -43,32 +47,45 @@ nvidia-smi
 source activate af2
  
 #Make sure to specify the output_dir to a path that you have write permission
-python3 /cluster/tufts/cmdb295class/shared/alphafold/alphafold/run_af2.py \
---output_dir=$2 \
---fasta_paths=$3
+python3 $3 \
+--output_dir=$4 \
+--fasta_paths=$5"
 EOT
 }
 
 numArg=$#
+afScript="/cluster/tufts/cmdb295class/shared/alphafold/alphafold/run_af2.py"
+afPath=""
 errorDir=""
-eFlag=""
 outputDir=""
+pFlag=""
+eFlag=""
 oFlag=""
 proteinFiles=()
 
-while getopts he:o: flag; do
+while getopts ha:p:e:o: flag; do
   case "${flag}" in
     h) 
-      usage
-      exit 0;;
+       usage
+       exit 0
+       ;;
+    a)
+       afScript="$(realpath $OPTARG)"
+       ;;
+    p)
+       pFlag=1
+       afPath="$(realpath $OPTARG)"
+       ;;
     e) 
        eFlag=1
        errorDir="$(realpath $OPTARG)"
-       mkdir -p $errorDir;;
+       mkdir -p $errorDir
+       ;;
     o)
        oFlag=1
        outputDir="$(realpath $OPTARG)"
-       mkdir -p $outputDir;;
+       mkdir -p $outputDir
+       ;;
    esac
 done
 shift $(($OPTIND - 1))
@@ -78,7 +95,10 @@ currentDateTime="$(date +%Y%m%d_%H%M%S)"
 errorTitle="alphafold_error_$currentDateTime"
 outputTitle="alphafold_output_$currentDateTime"
 
-# Place in current directory by default
+if  [[ -z $pFlag ]];
+then
+  afPath=$(basename $afScript)
+fi
 if  [[ -z $eFlag ]];
 then
   mkdir $errorTitle
@@ -102,7 +122,7 @@ then
     proteinDir=$(basename $proteinFile)
     proteinErrorDir="$errorDir/${proteinDir%.*}"  
     mkdir -p $proteinErrorDir
-    run_sbatch $proteinErrorDir $outputDir $proteinFile
+    run_sbatch $proteinErrorDir $afPath $afScript $outputDir $proteinFile
   done
   exit 0
 elif [[ -f $* ]];
@@ -110,7 +130,7 @@ then
   proteinDir=$(basename $*)
   proteinErrorDir="$errorDir/${proteinDir%.*}"  
   mkdir -p $proteinErrorDir
-  run_sbatch $proteinErrorDir $outputDir $*
+  run_sbatch $proteinErrorDir $afPath $afScript $outputDir $*
   exit 0
 else
   echo "Invalid or nonexistent directory $*"

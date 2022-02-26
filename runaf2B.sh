@@ -41,13 +41,15 @@ sbatch <<EOT
 #SBATCH -mail-user=$2
 #SBATCH -N 1
 #SBATCH --gres=gpu:1 # number of GPUs. please follow instructions in Pax User Guide when submit jobs to different partition and selecting different GPU architectures.
+path=$3
+script=$4
 module load alphafold/2.1.1
 module list
 nvidia-smi
 module help alphafold/2.1.1 # this command will print out all input options for "runaf2"
 command
 source activate alphafold2.1.1
-runaf2 -o $3 -f $4 -t 2024-01-01
+runaf2 -o $5 -f $6 -t 2024-01-01
 EOT
 }
 

@@ -94,7 +94,7 @@ while getopts hna:p:o:e:m: flag; do
        usage
        exit 0
        ;;
-    d)
+    n)
        debugFlag=1
        ;;
     a)

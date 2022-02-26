@@ -174,7 +174,7 @@ then
   errorDir="$(realpath ./$errorTitle)"
 else
   mkdir -p $errorDir
-  errorDir="$(realpath $OPTARG)"
+  errorDir="$(realpath $errorDir)"
 fi
 if [[ -z $oFlag ]];
 then
@@ -182,7 +182,7 @@ then
   outputDir="$(realpath ./$outputTitle)"
 else
   mkdir -p $outputDir
-  outputDir="$(realpath $OPTARG)"
+  outputDir="$(realpath $outputDir)"
 fi
 
 # Run batch script for each protein sequence file in directory, or an individual .fa or .fasta file

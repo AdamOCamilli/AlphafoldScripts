@@ -64,13 +64,15 @@ cat <<EOT
 #SBATCH -mail-user=$2
 #SBATCH -N 1
 #SBATCH --gres=gpu:1 # number of GPUs. please follow instructions in Pax User Guide when submit jobs to different partition and selecting different GPU architectures.
+path=$3
+script=$4
 module load alphafold/2.1.1
 module list
 nvidia-smi
 module help alphafold/2.1.1 # this command will print out all input options for "runaf2"
 command
 source activate alphafold2.1.1
-runaf2 -o $3 -f $4 -t 2024-01-01
+runaf2 -o $5 -f $6 -t 2024-01-01
 EOT
 }
 
@@ -134,6 +136,11 @@ currentDateTime="$(date +%Y%m%d_%H%M%S)"
 errorTitle="alphafold_error_$currentDateTime"
 outputTitle="alphafold_output_$currentDateTime"
 
+if  [[ -z $pFlag ]];
+then
+  afPath=$(basename $afScript)
+fi
+
 # print sbatch script if debug flag set
 if [[ $debugFlag ]];
 then
@@ -147,14 +154,14 @@ then
     for proteinFile in "${proteinFiles[@]}"; do
       proteinDir=$(basename $proteinFile)
       proteinErrorDir="$errorDir/${proteinDir%.*}"
-      printSbatch $proteinErrorDir $afPath $afScript $outputDir $proteinFile
+      printSbatch $proteinErrorDir $email $afPath $afScript $outputDir $proteinFile
     done
     exit 0
   elif [[ -f $* ]];
   then
     proteinDir=$(basename $*)
     proteinErrorDir="$errorDir/${proteinDir%.*}"
-    printSbatch $proteinErrorDir $afPath $afScript $outputDir $*
+    printSbatch $proteinErrorDir $email $afPath $afScript $outputDir $*
     exit 0
   else
     echo "Invalid or nonexistent directory $*"
@@ -163,10 +170,6 @@ then
   fi
 fi
 
-if  [[ -z $pFlag ]];
-then
-  afPath=$(basename $afScript)
-fi
 if  [[ -z $eFlag ]];
 then
   mkdir $errorTitle
@@ -196,7 +199,7 @@ then
     proteinDir=$(basename $proteinFile)
     proteinErrorDir="$errorDir/${proteinDir%.*}"
     mkdir -p $proteinErrorDir
-    runSbatch $proteinErrorDir $afPath $afScript $outputDir $proteinFile
+    runSbatch $proteinErrorDir $email $afPath $afScript $outputDir $proteinFile
   done
   exit 0
 elif [[ -f $* ]];
@@ -204,7 +207,7 @@ then
   proteinDir=$(basename $*)
   proteinErrorDir="$errorDir/${proteinDir%.*}"
   mkdir -p $proteinErrorDir
-  runSbatch $proteinErrorDir $afPath $afScript $outputDir $*
+  runSbatch $proteinErrorDir $email $afPath $afScript $outputDir $*
   exit 0
 else
   echo "Invalid or nonexistent directory $*"

@@ -11,7 +11,7 @@
 # Display correct usage if input is incorrect
 function usage() {
   scriptName=$(basename $0);
-  printf "usage: ./$scriptName [-h] [options] FILE/DIR\n"
+  printf "usage: ./$scriptName [options] FILE/DIR\n"
   printf "Run one or more Alphafold batch jobs for each protein sequence file in a directory. You can also pass in individual sequence files.\n"
   printf "  -h                display help\n"
   printf "  -n                debug: print sbatch command instead of executing it \n"
@@ -135,7 +135,7 @@ errorTitle="alphafold_error_$currentDateTime"
 outputTitle="alphafold_output_$currentDateTime"
 
 # print sbatch script if debug flag set
-if [[ debugFlag ]];
+if [[ $debugFlag ]];
 then
   if [[ -n $* ]];
   then

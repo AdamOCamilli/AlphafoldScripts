@@ -146,7 +146,7 @@ fi
 # print sbatch script if debug flag set
 if [[ $debugFlag ]];
 then
-  if [[ -n $* ]];
+  if [[ -d $* ]];
   then
     shopt -s nullglob # don't match empty files
     for file in "$1"/*.{fasta,fa}; do

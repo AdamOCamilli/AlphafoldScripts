@@ -37,8 +37,8 @@ sbatch <<EOT
 #SBATCH --time=2-0 #run 2 days, up to 7 days "7-00:00:00"
 #SBATCH -o $1.%j
 #SBATCH -e $1.%j
-#SBATCH -mail-type=END
-#SBATCH -mail-user=$2
+#SBATCH --mail-type=END
+#SBATCH --mail-user=$2
 #SBATCH -N 1
 #SBATCH --gres=gpu:1 # number of GPUs. please follow instructions in Pax User Guide when submit jobs to different partition and selecting different GPU architectures.
 module load alphafold/2.1.1
@@ -60,8 +60,8 @@ cat <<EOT
 #SBATCH --time=2-0 #run 2 days, up to 7 days "7-00:00:00"
 #SBATCH -o $1/.%j
 #SBATCH -e $1/.%j
-#SBATCH -mail-type=END
-#SBATCH -mail-user=$2
+#SBATCH --mail-type=END
+#SBATCH --mail-user=$2
 #SBATCH -N 1
 #SBATCH --gres=gpu:1 # number of GPUs. please follow instructions in Pax User Guide when submit jobs to different partition and selecting different GPU architectures.
 module load alphafold/2.1.1

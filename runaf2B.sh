@@ -41,8 +41,6 @@ sbatch <<EOT
 #SBATCH -mail-user=$2
 #SBATCH -N 1
 #SBATCH --gres=gpu:1 # number of GPUs. please follow instructions in Pax User Guide when submit jobs to different partition and selecting different GPU architectures.
-path=$3
-script=$4
 module load alphafold/2.1.1
 module list
 nvidia-smi
@@ -66,8 +64,6 @@ cat <<EOT
 #SBATCH -mail-user=$2
 #SBATCH -N 1
 #SBATCH --gres=gpu:1 # number of GPUs. please follow instructions in Pax User Guide when submit jobs to different partition and selecting different GPU architectures.
-path=$3
-script=$4
 module load alphafold/2.1.1
 module list
 nvidia-smi

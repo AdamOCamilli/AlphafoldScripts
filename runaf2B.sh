@@ -14,7 +14,7 @@ function usage() {
   printf "usage: ./$scriptName [-h] [options] FILE/DIR\n"
   printf "Run one or more Alphafold batch jobs for each protein sequence file in a directory. You can also pass in individual sequence files.\n"
   printf "  -h                display help\n"
-  printf "  -d                debug: print sbatch command instead of executing it \n"
+  printf "  -n                debug: print sbatch command instead of executing it \n"
   printf "  -a <script>       optionally specify location of alphafold script \n"
   printf "                    default location: /cluster/tufts/hpc/tools/alphafold/2.1.1/alphafold/run_alphafold.py \n"
   printf "  -p <path>         optionally specify alphafold path \n"
@@ -88,7 +88,7 @@ oFlag=""
 mFlag=""
 proteinFiles=()
 
-while getopts hda:p:o:e:m: flag; do
+while getopts hna:p:o:e:m: flag; do
   case "${flag}" in
     h)
        usage
@@ -137,7 +137,7 @@ outputTitle="alphafold_output_$currentDateTime"
 # print sbatch script if debug flag set
 if [[ debugFlag ]];
 then
-  if [[ -d $* ]];
+  if [[ -n $* ]];
   then
     shopt -s nullglob # don't match empty files
     for file in "$1"/*.{fasta,fa}; do

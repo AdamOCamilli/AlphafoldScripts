@@ -83,7 +83,7 @@ afScript="/cluster/tufts/hpc/tools/alphafold/2.1.1/alphafold/run_alphafold.py"
 afPath=""
 errorDir=""
 outputDir=""
-email=""
+email="none"
 
 debugFlag=""
 pFlag=""

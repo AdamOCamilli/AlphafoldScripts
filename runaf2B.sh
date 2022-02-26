@@ -58,8 +58,8 @@ cat <<EOT
 #SBATCH -n 8 # 8 cpu cores
 #SBATCH --mem=64g #64GB of RAM
 #SBATCH --time=2-0 #run 2 days, up to 7 days "7-00:00:00"
-#SBATCH -o $1.%j
-#SBATCH -e $1.%j
+#SBATCH -o $1/.%j
+#SBATCH -e $1/.%j
 #SBATCH -mail-type=END
 #SBATCH -mail-user=$2
 #SBATCH -N 1
@@ -151,14 +151,14 @@ then
     shopt -u nullglob
     for proteinFile in "${proteinFiles[@]}"; do
       proteinDir=$(basename $proteinFile)
-      proteinErrorDir="$errorDir/${proteinDir%.*}"
+      proteinErrorDir="$errorDir${proteinDir%.*}"
       printSbatch $proteinErrorDir $email $afPath $afScript $outputDir $proteinFile
     done
     exit 0
   elif [[ -f $* ]];
   then
     proteinDir=$(basename $*)
-    proteinErrorDir="$errorDir/${proteinDir%.*}"
+    proteinErrorDir="$errorDir${proteinDir%.*}"
     printSbatch $proteinErrorDir $email $afPath $afScript $outputDir $*
     exit 0
   else
